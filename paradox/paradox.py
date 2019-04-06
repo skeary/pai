@@ -145,7 +145,7 @@ class Paradox:
 
             logger.info("Starting communication")
             reply = await self.send_wait(self.panel.get_message('StartCommunication'),
-                                   args=dict(source_id=0x02), reply_expected=0x00)
+                                   args=dict(source_id=0x00), reply_expected=0x00)
 
             if reply is None:
                 raise ConnectionError("Panel did not replied to StartCommunication")

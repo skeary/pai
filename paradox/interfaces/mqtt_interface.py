@@ -356,6 +356,7 @@ class MQTTInterface(Interface):
                      "{}".format(state), 0, cfg.MQTT_RETAIN)
 
     def publish(self, topic, value, qos, retain):
+        self.logger.info('publish')
         self.logger.info(topic)
         
         self.cache[topic] = {'value': value, 'qos': qos, 'retain': retain}

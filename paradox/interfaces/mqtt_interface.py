@@ -144,10 +144,16 @@ class MQTTInterface(Interface):
 
         # Process a Partition Command
         elif topics[2] == cfg.MQTT_PARTITION_TOPIC:
+          
+            self.logger.info("SK: partition topic")
+            
+            if cfg.MQTT_HOMEASSISTANT_ENABLE:
+                 self.logger.info("SK: MQTT_HOMEASSISTANT_ENABLE")
 
             if command in cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS and cfg.MQTT_HOMEBRIDGE_ENABLE:
                 command = cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS[command]
             elif command in cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS and cfg.MQTT_HOMEASSISTANT_ENABLE:
+                self.logger.info("SK: MQTT_PARTITION_HOMEASSISTANT_COMMANDS")
                 command = cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS[command]
 
             if command.startswith('code_toggle-'):
@@ -287,11 +293,14 @@ class MQTTInterface(Interface):
                      "{}".format(publish_value), 0, cfg.MQTT_RETAIN)
 
         if element == 'partition':
+            self.logger.info("SK: partition change")
+
             if cfg.MQTT_HOMEBRIDGE_ENABLE:
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEBRIDGE_STATES, cfg.MQTT_HOMEBRIDGE_SUMMARY_TOPIC, 'hb')
 
             if cfg.MQTT_HOMEASSISTANT_ENABLE:
+                self.logger.info("SK: partition change, MQTT_HOMEASSISTANT_ENABLE")
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEASSISTANT_STATES, cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC,
                                             'hass')

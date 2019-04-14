@@ -299,6 +299,8 @@ class MQTTInterface(Interface):
                                             cfg.MQTT_PARTITION_HOMEBRIDGE_STATES, cfg.MQTT_HOMEBRIDGE_SUMMARY_TOPIC, 'hb')
 
             if cfg.MQTT_HOMEASSISTANT_ENABLE:
+                self.logger.info('publish')
+                self.logger.info(value)
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEASSISTANT_STATES, cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC,
                                             'hass')
@@ -356,9 +358,7 @@ class MQTTInterface(Interface):
                      "{}".format(state), 0, cfg.MQTT_RETAIN)
 
     def publish(self, topic, value, qos, retain):
-        self.logger.info('publish')
-        self.logger.info(topic)
-        
+       
         self.cache[topic] = {'value': value, 'qos': qos, 'retain': retain}
         self.mqtt.publish(topic, value, qos, retain)
 

@@ -314,6 +314,8 @@ class MQTTInterface(Interface):
         if service not in self.armed:
             self.armed[service] = dict()
 
+        first_time = False
+
         if label not in self.armed[service]:
             self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             first_time = True

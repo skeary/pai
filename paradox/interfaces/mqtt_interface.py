@@ -347,8 +347,9 @@ class MQTTInterface(Interface):
                 state = states_map['disarm']
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
-                self.logger.info('not publish')
-                self.logger.info(attribute)
+                if summary_topic != cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
+                  self.logger.info('not publish')
+                  self.logger.info(attribute)
                 return  # Do not publish a change
 
         self.publish('{}/{}/{}/{}/{}'.format(cfg.MQTT_BASE_TOPIC,

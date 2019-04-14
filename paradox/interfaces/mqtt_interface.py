@@ -299,8 +299,7 @@ class MQTTInterface(Interface):
                                             cfg.MQTT_PARTITION_HOMEBRIDGE_STATES, cfg.MQTT_HOMEBRIDGE_SUMMARY_TOPIC, 'hb')
 
             if cfg.MQTT_HOMEASSISTANT_ENABLE:
-                self.logger.info('publish')
-                self.logger.info(value)
+
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEASSISTANT_STATES, cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC,
                                             'hass')
@@ -348,6 +347,8 @@ class MQTTInterface(Interface):
                 state = states_map['disarm']
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
+                self.logger.info('not publish')
+                self.logger.info(attribute)
                 return  # Do not publish a change
 
         self.publish('{}/{}/{}/{}/{}'.format(cfg.MQTT_BASE_TOPIC,

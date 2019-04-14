@@ -269,6 +269,9 @@ class MQTTInterface(Interface):
             if label not in self.partitions:
                 self.partitions[label] = dict()
 
+                self.logger.info('NEW PARTITION')
+                self.logger.info(label)
+
                 # After we get 2 partitions, lets publish a dashboard
                 if cfg.MQTT_DASH_PUBLISH and len(self.partitions) == 2:
                     self.publish_dash(cfg.MQTT_DASH_TEMPLATE, list(self.partitions.keys()))
@@ -347,7 +350,7 @@ class MQTTInterface(Interface):
                 state = states_map['disarm']
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
-                if summary_topic != cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
+                if summary_topic == cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
                   self.logger.info('not publish')
                   self.logger.info(attribute)
                 return  # Do not publish a change

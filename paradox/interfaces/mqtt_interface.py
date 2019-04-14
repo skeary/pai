@@ -316,6 +316,7 @@ class MQTTInterface(Interface):
 
         if label not in self.armed[service]:
             self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
+            first_time = True
 
         # Property changing to True: Alarm or arm
         if value:
@@ -346,7 +347,7 @@ class MQTTInterface(Interface):
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
 
-            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and self.armed[service][label]['attribute'] == attribute:
+            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and (first_time || self.armed[service][label]['attribute'] == attribute):
                 state = states_map['disarm']
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:

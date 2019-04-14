@@ -354,9 +354,13 @@ class MQTTInterface(Interface):
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
                 if summary_topic == cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
-                  self.logger.info('not publish')
+                  self.logger.info('not publish to HA')
                   self.logger.info(attribute)
                 return  # Do not publish a change
+
+        if summary_topic == cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
+          self.logger.info('publish to HA')
+          self.logger.info(attribute)
 
         self.publish('{}/{}/{}/{}/{}'.format(cfg.MQTT_BASE_TOPIC,
                                              cfg.MQTT_STATES_TOPIC,

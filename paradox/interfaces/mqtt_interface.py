@@ -144,16 +144,10 @@ class MQTTInterface(Interface):
 
         # Process a Partition Command
         elif topics[2] == cfg.MQTT_PARTITION_TOPIC:
-          
-            self.logger.info("SK: partition topic")
-            
-            if cfg.MQTT_HOMEASSISTANT_ENABLE:
-                 self.logger.info("SK: MQTT_HOMEASSISTANT_ENABLE")
 
             if command in cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS and cfg.MQTT_HOMEBRIDGE_ENABLE:
                 command = cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS[command]
             elif command in cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS and cfg.MQTT_HOMEASSISTANT_ENABLE:
-                self.logger.info("SK: MQTT_PARTITION_HOMEASSISTANT_COMMANDS")
                 command = cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS[command]
 
             if command.startswith('code_toggle-'):
@@ -269,9 +263,6 @@ class MQTTInterface(Interface):
             if label not in self.partitions:
                 self.partitions[label] = dict()
 
-                self.logger.info('NEW PARTITION')
-                self.logger.info(label)
-
                 # After we get 2 partitions, lets publish a dashboard
                 if cfg.MQTT_DASH_PUBLISH and len(self.partitions) == 2:
                     self.publish_dash(cfg.MQTT_DASH_TEMPLATE, list(self.partitions.keys()))
@@ -296,13 +287,11 @@ class MQTTInterface(Interface):
                      "{}".format(publish_value), 0, cfg.MQTT_RETAIN)
 
         if element == 'partition':
-
             if cfg.MQTT_HOMEBRIDGE_ENABLE:
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEBRIDGE_STATES, cfg.MQTT_HOMEBRIDGE_SUMMARY_TOPIC, 'hb')
 
             if cfg.MQTT_HOMEASSISTANT_ENABLE:
-
                 self.handle_change_external(element, label, attribute, value, element_topic,
                                             cfg.MQTT_PARTITION_HOMEASSISTANT_STATES, cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC,
                                             'hass')
@@ -314,11 +303,8 @@ class MQTTInterface(Interface):
         if service not in self.armed:
             self.armed[service] = dict()
 
-        first_time = False
-
         if label not in self.armed[service]:
             self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
-            first_time = True
 
         # Property changing to True: Alarm or arm
         if value:
@@ -349,18 +335,11 @@ class MQTTInterface(Interface):
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
 
-            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and (first_time or self.armed[service][label]['attribute'] == attribute):
+            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and self.armed[service][label]['attribute'] == attribute:
                 state = states_map['disarm']
                 self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
-                if summary_topic == cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
-                  self.logger.info('not publish to HA')
-                  self.logger.info(attribute)
                 return  # Do not publish a change
-
-        if summary_topic == cfg.MQTT_HOMEASSISTANT_SUMMARY_TOPIC:
-          self.logger.info('publish to HA')
-          self.logger.info(attribute)
 
         self.publish('{}/{}/{}/{}/{}'.format(cfg.MQTT_BASE_TOPIC,
                                              cfg.MQTT_STATES_TOPIC,
@@ -370,7 +349,6 @@ class MQTTInterface(Interface):
                      "{}".format(state), 0, cfg.MQTT_RETAIN)
 
     def publish(self, topic, value, qos, retain):
-       
         self.cache[topic] = {'value': value, 'qos': qos, 'retain': retain}
         self.mqtt.publish(topic, value, qos, retain)
 
@@ -380,8 +358,12 @@ class MQTTInterface(Interface):
             self.mqtt.publish(k, v['value'], v['qos'], v['retain'])
 
     def publish_dash(self, fname, partitions):
+        self.logger.info("In publish_dash 1")
+
         if len(partitions) < 2:
             return
+
+        self.logger.info("In publish_dash 2")
 
         if os.path.exists(fname):
             with open(fname, 'r') as f:
@@ -391,3 +373,4 @@ class MQTTInterface(Interface):
                 self.logger.info("MQTT Dash panel published to {}".format(cfg.MQTT_DASH_TOPIC))
         else:
             self.logger.warn("MQTT DASH Template not found: {}".format(fname))
+         

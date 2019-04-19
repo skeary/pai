@@ -59,10 +59,13 @@ class MQTTInterface(Interface):
             try:
                 item = self.queue.get()
                 if item[1] == 'change':
+                    self.logger.info("change")
                     self.handle_change(item[2])
                 elif item[1] == 'event':
+                    self.logger.info("event")
                     self.handle_event(item[2])
                 elif item[1] == 'command':
+                    self.logger.info("command")
                     if item[2] == 'stop':
                         break
                 if time.time() - last_republish > cfg.MQTT_REPUBLISH_INTERVAL:

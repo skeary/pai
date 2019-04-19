@@ -306,6 +306,8 @@ class MQTTInterface(Interface):
                                value, element_topic, states_map,
                                summary_topic, service):
 
+        self.logger.info("handle_change_external - {}.{}.{}.{}").format(element, label, attribute, value)
+
         if service not in self.armed:
             self.armed[service] = dict()
 

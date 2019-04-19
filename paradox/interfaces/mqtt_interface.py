@@ -312,7 +312,7 @@ class MQTTInterface(Interface):
             self.armed[service] = dict()
 
         if label not in self.armed[service]:
-            self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
+            self.armed[service][label] = dict(attribute=None, state=None, alarm=False, exit_delay=False)
 
         # Property changing to True: Alarm or arm
         if value:
@@ -320,7 +320,6 @@ class MQTTInterface(Interface):
                 state = states_map['alarm']
                 self.armed[service][label]['alarm'] = True
                 
-
             # only process if not armed already
             elif self.armed[service][label]['attribute'] is None:
                 if attribute == 'stay_arm':
@@ -343,14 +342,13 @@ class MQTTInterface(Interface):
         # Property changing to False: Disarm or alarm stop
         else:
             # Alarm stopped
-            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and (self.armed[service][label]['alarm'] or self.armed[service][label]['exit_delay']):
+            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and self.armed[service][label]['alarm']:
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
-                self.armed[service][label]['exit_delay'] = False  # Reset exit delay state
 
-            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and self.armed[service][label]['attribute'] == attribute:
+            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and (self.armed[service][label]['attribute'] == attribute or self.armed[service][label]['exit_delay']):
                 state = states_map['disarm']
-                self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
+                self.armed[service][label] = dict(attribute=None, state=None, alarm=False, exit_delay=True)
             else:
                 return  # Do not publish a change
 

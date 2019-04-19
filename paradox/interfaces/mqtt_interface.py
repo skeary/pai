@@ -321,7 +321,7 @@ class MQTTInterface(Interface):
                 self.armed[service][label]['alarm'] = True
 
             # only process if change arm attribute
-            if attribute in ['stay_alarm', 'arm', 'sleep_arm', 'exit_delay'] and self.armed[service][label]['attribute'] != attribute
+            if attribute in ['stay_alarm', 'arm', 'sleep_arm', 'exit_delay'] and not self.armed[service][label]['attribute'] == attribute
 
                 if attribute == 'stay_arm':
                     state = states_map['stay_arm']

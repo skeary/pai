@@ -317,6 +317,7 @@ class MQTTInterface(Interface):
             if attribute in ['alarm', 'bell_activated', 'strobe_alarm', 'silent_alarm', 'audible_alarm'] and not self.armed[service][label]['alarm']:
                 state = states_map['alarm']
                 self.armed[service][label]['alarm'] = True
+                
 
             # only process if not armed already
             elif self.armed[service][label]['attribute'] is None:
@@ -327,6 +328,7 @@ class MQTTInterface(Interface):
                 elif attribute == 'sleep_arm':
                     state = states_map['sleep_arm']
                 elif attribute == 'exit_delay':
+                    self.armed[service][label]['exit_delay'] = True
                     state = states_map['exit_delay']
                 else:
                     return
@@ -339,9 +341,10 @@ class MQTTInterface(Interface):
         # Property changing to False: Disarm or alarm stop
         else:
             # Alarm stopped
-            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and self.armed[service][label]['alarm']:
+            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and (self.armed[service][label]['alarm'] OR self.armed[service][label]['exit_delay']):
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
+                self.armed[service][label]['exit_delay'] = False  # Reset exit delay state
 
             elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and self.armed[service][label]['attribute'] == attribute:
                 state = states_map['disarm']

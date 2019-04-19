@@ -273,6 +273,8 @@ class MQTTInterface(Interface):
                 if cfg.MQTT_DASH_PUBLISH and len(self.partitions) == 2:
                     self.publish_dash(cfg.MQTT_DASH_TEMPLATE, list(self.partitions.keys()))
 
+            self.logger.info("Partition change {} - {}".format(attribute, value))
+
             self.partitions[label][attribute] = value
 
         if element in ELEMENT_TOPIC_MAP:

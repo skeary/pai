@@ -273,8 +273,6 @@ class MQTTInterface(Interface):
                 if cfg.MQTT_DASH_PUBLISH and len(self.partitions) == 2:
                     self.publish_dash(cfg.MQTT_DASH_TEMPLATE, list(self.partitions.keys()))
 
-            self.logger.info("Partition change {} - {}".format(attribute, value))
-
             self.partitions[label][attribute] = value
 
         if element in ELEMENT_TOPIC_MAP:
@@ -312,16 +310,17 @@ class MQTTInterface(Interface):
             self.armed[service] = dict()
 
         if label not in self.armed[service]:
-            self.armed[service][label] = dict(attribute=None, state=None, alarm=False, exit_delay=False)
+            self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
 
         # Property changing to True: Alarm or arm
         if value:
             if attribute in ['alarm', 'bell_activated', 'strobe_alarm', 'silent_alarm', 'audible_alarm'] and not self.armed[service][label]['alarm']:
                 state = states_map['alarm']
                 self.armed[service][label]['alarm'] = True
-                
-            # only process if not armed already
-            elif self.armed[service][label]['attribute'] is None:
+
+            # only process if change arm attribute
+            if attribute in ['stay_alarm', 'arm', 'sleep_arm', 'exit_delay'] and self.armed[service][label]['attribute'] != attribute
+
                 if attribute == 'stay_arm':
                     state = states_map['stay_arm']
                 elif attribute == 'arm':
@@ -329,7 +328,6 @@ class MQTTInterface(Interface):
                 elif attribute == 'sleep_arm':
                     state = states_map['sleep_arm']
                 elif attribute == 'exit_delay':
-                    self.armed[service][label]['exit_delay'] = True
                     state = states_map['exit_delay']
                 else:
                     return
@@ -346,9 +344,9 @@ class MQTTInterface(Interface):
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
 
-            elif attribute in ['stay_arm', 'arm', 'sleep_arm'] and (self.armed[service][label]['attribute'] == attribute or self.armed[service][label]['exit_delay']):
+            elif attribute in ['stay_arm', 'arm', 'sleep_arm', 'exit_delay'] and self.armed[service][label]['attribute'] == attribute:
                 state = states_map['disarm']
-                self.armed[service][label] = dict(attribute=None, state=None, alarm=False, exit_delay=True)
+                self.armed[service][label] = dict(attribute=None, state=None, alarm=False)
             else:
                 return  # Do not publish a change
 

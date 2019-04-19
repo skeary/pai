@@ -346,7 +346,7 @@ class MQTTInterface(Interface):
         # Property changing to False: Disarm or alarm stop
         else:
             # Alarm stopped
-            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and (self.armed[service][label]['alarm'] OR self.armed[service][label]['exit_delay']):
+            if attribute in ['alarm', 'strobe_alarm', 'audible_alarm', 'bell_activated', 'silent_alarm'] and (self.armed[service][label]['alarm'] or self.armed[service][label]['exit_delay']):
                 state = self.armed[service][label]['state']  # Restore the ARM state
                 self.armed[service][label]['alarm'] = False  # Reset alarm state
                 self.armed[service][label]['exit_delay'] = False  # Reset exit delay state

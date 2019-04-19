@@ -145,6 +145,12 @@ class MQTTInterface(Interface):
         # Process a Partition Command
         elif topics[2] == cfg.MQTT_PARTITION_TOPIC:
 
+            self.logger.info(
+                "Partition topic command. HA enable: {}".format(cfg.MQTT_HOMEASSISTANT_ENABLE))
+
+            self.logger.info(
+                "MQTT_PARTITION_HOMEASSISTANT_COMMANDS: {}".format(cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS))
+
             if command in cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS and cfg.MQTT_HOMEBRIDGE_ENABLE:
                 command = cfg.MQTT_PARTITION_HOMEBRIDGE_COMMANDS[command]
             elif command in cfg.MQTT_PARTITION_HOMEASSISTANT_COMMANDS and cfg.MQTT_HOMEASSISTANT_ENABLE:
@@ -257,7 +263,7 @@ class MQTTInterface(Interface):
     def handle_change(self, raw):
         element, label, attribute, value = raw
         """Handle Property Change"""
-        
+
         # Keep track of ARM state
         if element == 'partition':
             if label not in self.partitions:
@@ -373,4 +379,4 @@ class MQTTInterface(Interface):
                 self.logger.info("MQTT Dash panel published to {}".format(cfg.MQTT_DASH_TOPIC))
         else:
             self.logger.warn("MQTT DASH Template not found: {}".format(fname))
-         
+

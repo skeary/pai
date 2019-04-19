@@ -320,6 +320,8 @@ class MQTTInterface(Interface):
                     state = states_map['arm']
                 elif attribute == 'sleep_arm':
                     state = states_map['sleep_arm']
+                elif attribute == 'exit_delay':
+                    state = states_map['exit_delay']
                 else:
                     return
 
